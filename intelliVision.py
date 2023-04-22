@@ -84,3 +84,13 @@ class NeuralNetwork(nn.Module):
     
 model = NeuralNetwork().to(device)
 print(model)
+
+loss_fn = nn.CrossEntropyLoss()
+optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
+
+epochs = 10
+for t in range(epochs):
+    print(f"Epoch {t+1}\n-------------------------------")
+    train(train_dataloader, model, loss_fn, optimizer)
+    test(test_dataloader, model)
+print("Done!")
