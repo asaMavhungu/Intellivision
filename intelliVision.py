@@ -62,3 +62,25 @@ batch_size = 100
 # Create data loaders.
 train_dataloader = DataLoader(training_data, batch_size=batch_size, shuffle=True, num_workers=4)
 test_dataloader = DataLoader(test_data, batch_size=batch_size, shuffle=True, num_workers=4)
+
+# Define model
+class NeuralNetwork(nn.Module):
+    def __init__(self):
+        super(NeuralNetwork, self).__init__()
+        self.flatten = nn.Flatten()
+        self.linear_relu_stack = nn.Sequential(
+            nn.Linear(32*32*3, 1024),
+            nn.ReLU(),
+            nn.Linear(1024, 512),
+            nn.ReLU(),
+        	nn.Linear(512, 10),
+            nn.ReLU()
+        )
+
+    def forward(self, x):
+        x = self.flatten(x)
+        logits = self.linear_relu_stack(x)
+        return logits
+    
+model = NeuralNetwork().to(device)
+print(model)
