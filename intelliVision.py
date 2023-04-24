@@ -70,17 +70,6 @@ print(f"Using {device} device")
 # Creat the model and send its parameters to the appropriate device
 mlp = MLP().to(device)
 
-examples = enumerate(test_loader)
-batch_idx, (example_data, example_targets) = next(examples)
-
-# Test on a batch of data
-with torch.no_grad():  # Don't accumlate gradients
-  mlp.eval()  # We are in evalutation mode
-  x = example_data.to(device)
-  outputs = mlp(x)  # Alias for mlp.forward
-
-  # Print example output.
-  print(torch.exp(outputs[0]))
 
 import torch.optim as optim # Optimizers
 
