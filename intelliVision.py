@@ -46,8 +46,9 @@ class MLP(nn.Module):
         self.flatten = nn.Flatten() # For flattening the 2D image
         self.fc1 = nn.Linear(32*32*3, 512*2)  # Input is image with shape (32x32x3)
         self.fc2 = nn.Linear(512*2, 512*2)  # First HL
-        self.fc3= nn.Linear(512*2, 256) # Second HL
-        self.fc4= nn.Linear(256, 10) # Third HL
+        self.fc3= nn.Linear(512*2, 256*2) # Second HL
+        self.fc4= nn.Linear(512, 256) # Third HL
+        self.fc5= nn.Linear(256, 10) # Fourth HL
         self.output = nn.LogSoftmax(dim=1)
 
     def forward(self, x):
@@ -56,7 +57,8 @@ class MLP(nn.Module):
       x = F.relu(self.fc1(x))  # First Hidden Layer
       x = F.relu(self.fc2(x))  # Second Hidden Layer
       x = F.relu(self.fc3(x))  # third Hidden Layer
-      x = self.fc4(x)  # Output Layer
+      x = F.relu(self.fc4(x))  # Fourth Hidden Layer
+      x = self.fc5(x)  # Output Layer
       x = self.output(x)  # For multi-class classification
       return x  # Has shape (B, 10)
 
@@ -69,6 +71,7 @@ print(f"Using {device} device")
 
 # Creat the model and send its parameters to the appropriate device
 mlp = MLP().to(device)
+
 
 
 import torch.optim as optim # Optimizers
