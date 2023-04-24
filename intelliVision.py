@@ -113,7 +113,7 @@ def test(net, test_loader, device):
 
 mlp = MLP().to(device)
 
-LEARNING_RATE = 1e-4
+LEARNING_RATE = 1e-2
 MOMENTUM = 0.9
 
 # Define the loss function, optimizer, and learning rate scheduler
