@@ -2,8 +2,21 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader
 from torchvision import datasets
-from torchvision.transforms import ToTensor
+from torchvision.transforms import ToTensor, Compose, RandomHorizontalFlip, Normalize, RandomRotation, RandomCrop
 
+transform_train = Compose([
+    RandomHorizontalFlip(),
+    RandomRotation(10),
+    #RandomCrop(32, padding=4),
+    ToTensor(),
+    Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+])
+
+# Normalize the test set same as training set without augmentation
+transform_test = Compose([
+    ToTensor(),
+    Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+])
 
 # MNIST dataset 
 training_data = datasets.CIFAR10(
@@ -60,8 +73,8 @@ def test(dataloader, model):
 
 batch_size = 100
 # Create data loaders.
-train_dataloader = DataLoader(training_data, batch_size=batch_size, shuffle=True, num_workers=4)
-test_dataloader = DataLoader(test_data, batch_size=batch_size, shuffle=True, num_workers=4)
+train_dataloader = DataLoader(training_data, batch_size=batch_size, shuffle=True, num_workers=2)
+test_dataloader = DataLoader(test_data, batch_size=batch_size, shuffle=True, num_workers=2)
 
 # Define model
 class NeuralNetwork(nn.Module):
@@ -71,10 +84,18 @@ class NeuralNetwork(nn.Module):
         self.linear_relu_stack = nn.Sequential(
             nn.Linear(32*32*3, 1024),
             nn.ReLU(),
-            nn.Linear(1024, 512),
+            nn.Dropout(p=0.5),
+            nn.Linear(1024, 1024),
             nn.ReLU(),
-        	nn.Linear(512, 10),
-            nn.ReLU()
+            nn.Dropout(p=0.5),
+            nn.Linear(1024, 1024),
+            nn.ReLU(),
+            nn.Dropout(p=0.5),
+            nn.Linear(1024, 1024),
+            nn.ReLU(),
+            nn.Dropout(p=0.5),
+        	nn.Linear(1024, 10),
+            #nn.ReLU()
         )
 
     def forward(self, x):
@@ -86,9 +107,9 @@ model = NeuralNetwork().to(device)
 print(model)
 
 loss_fn = nn.CrossEntropyLoss()
-optimizer = torch.optim.SGD(model.parameters(), lr=1e-2, momentum=0.9)
+optimizer = torch.optim.SGD(model.parameters(), lr=5e-3, momentum=0.9)
 
-epochs = 10
+epochs = 15
 for t in range(epochs):
     print(f"Epoch {t+1}\n-------------------------------")
     train(train_dataloader, model, loss_fn, optimizer)
