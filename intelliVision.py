@@ -2,20 +2,26 @@ import torch  # Main Package
 import torchvision  # Package for Vision Related ML
 import torchvision.transforms as transforms  # Subpackage that contains image transforms
 
-# Create the transform sequence
-transform = transforms.Compose([
-    transforms.ToTensor(),  # Convert to Tensor
-    # Normalize Image to [-1, 1] first number is mean, second is std deviation
-    transforms.Normalize((0.5,), (0.5,)) 
+transform_train = transforms.Compose([
+    transforms.RandomHorizontalFlip(),
+    transforms.RandomRotation(10),
+    transforms.ToTensor(),
+    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+])
+
+# Normalize the test set same as training set without augmentation
+transform_test = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
 ])
 
 # Load MNIST dataset
 # Train
 trainset = torchvision.datasets.CIFAR10(root='./data', train=True,
-                                      download=True, transform=transform)
+                                      download=True, transform=transform_train)
 # Test
 testset = torchvision.datasets.CIFAR10(root='./data', train=False,
-                                      download=True, transform=transform)
+                                      download=True, transform=transform_test)
 
 # Send data to the data loaders
 BATCH_SIZE = 128
@@ -119,43 +125,3 @@ for epoch in range(10):
     train_loss = train(mlp, train_loader, criterion, optimizer, device)
     test_acc = test(mlp, test_loader, device)
     print(f"Epoch {epoch+1}: Train loss = {train_loss:.4f}, Test accuracy = {test_acc:.4f}")
-
-# Define model
-class NeuralNetwork(nn.Module):
-    def __init__(self):
-        super(NeuralNetwork, self).__init__()
-        self.flatten = nn.Flatten()
-        self.linear_relu_stack = nn.Sequential(
-            nn.Linear(32*32*3, 1024),
-            nn.ReLU(),
-            nn.Dropout(p=0.5),
-            nn.Linear(1024, 1024),
-            nn.ReLU(),
-            nn.Dropout(p=0.5),
-            nn.Linear(1024, 1024),
-            nn.ReLU(),
-            nn.Dropout(p=0.5),
-            nn.Linear(1024, 1024),
-            nn.ReLU(),
-            nn.Dropout(p=0.5),
-        	nn.Linear(1024, 10),
-            #nn.ReLU()
-        )
-
-    def forward(self, x):
-        x = self.flatten(x)
-        logits = self.linear_relu_stack(x)
-        return logits
-    
-model = NeuralNetwork().to(device)
-print(model)
-
-loss_fn = nn.CrossEntropyLoss()
-optimizer = torch.optim.SGD(model.parameters(), lr=5e-3, momentum=0.9)
-
-epochs = 15
-for t in range(epochs):
-    print(f"Epoch {t+1}\n-------------------------------")
-    train(train_dataloader, model, loss_fn, optimizer)
-    test(test_dataloader, model)
-print("Done!")
