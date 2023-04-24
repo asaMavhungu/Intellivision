@@ -105,10 +105,20 @@ def test(net, test_loader, device):
             correct += (predicted == labels).sum().item()  # How many are correct?
     return correct / total
 
-batch_size = 100
-# Create data loaders.
-train_dataloader = DataLoader(training_data, batch_size=batch_size, shuffle=True, num_workers=2)
-test_dataloader = DataLoader(test_data, batch_size=batch_size, shuffle=True, num_workers=2)
+mlp = MLP().to(device)
+
+LEARNING_RATE = 1e-4
+MOMENTUM = 0.9
+
+# Define the loss function, optimizer, and learning rate scheduler
+criterion = nn.NLLLoss()
+optimizer = optim.SGD(mlp.parameters(), lr=LEARNING_RATE, momentum=MOMENTUM)
+
+# Train the MLP for 5 epochs
+for epoch in range(10):
+    train_loss = train(mlp, train_loader, criterion, optimizer, device)
+    test_acc = test(mlp, test_loader, device)
+    print(f"Epoch {epoch+1}: Train loss = {train_loss:.4f}, Test accuracy = {test_acc:.4f}")
 
 # Define model
 class NeuralNetwork(nn.Module):
