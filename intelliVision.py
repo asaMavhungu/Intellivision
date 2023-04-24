@@ -30,6 +30,28 @@ test_loader = torch.utils.data.DataLoader(testset, batch_size=BATCH_SIZE,
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print("Using {} device".format(device))
 
+import torch.nn as nn  # Layers
+import torch.nn.functional as F # Activation Functions
+
+# Define the MLP architecture
+class MLP(nn.Module):
+    def __init__(self):
+        super(MLP, self).__init__()
+        self.flatten = nn.Flatten() # For flattening the 2D image
+        self.fc1 = nn.Linear(32*32*3, 512)  # Input is image with shape (28x28)
+        self.fc2 = nn.Linear(512, 256)  # First HL
+        self.fc3= nn.Linear(256, 10) # Second HL
+        self.output = nn.LogSoftmax(dim=1)
+
+    def forward(self, x):
+      # Batch x of shape (B, C, W, H)
+      x = self.flatten(x) # Batch now has shape (B, C*W*H)
+      x = F.relu(self.fc1(x))  # First Hidden Layer
+      x = F.relu(self.fc2(x))  # Second Hidden Layer
+      x = self.fc3(x)  # Output Layer
+      x = self.output(x)  # For multi-class classification
+      return x  # Has shape (B, 10)
+
 def train(dataloader, model, loss_fn, optimizer):
     size = len(dataloader.dataset)
     for batch, (X, y) in enumerate(dataloader):
