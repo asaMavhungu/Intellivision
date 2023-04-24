@@ -91,20 +91,19 @@ def train(net, train_loader, criterion, optimizer, device):
         running_loss += loss.item()  # Update loss
     return running_loss / len(train_loader)
 
-def test(dataloader, model):
-    size = len(dataloader.dataset)
-    model.eval() # WHAT DOES THIS DO?
-    test_loss, correct = 0, 0
-    with torch.no_grad():
-        for X, y in dataloader:
-            X, y = X.reshape(-1,32*32*3).to(device), y.to(device)
-            pred = model(X)
-            test_loss += loss_fn(pred, y).item()
-            correct += (pred.argmax(1) == y).type(torch.float).sum().item()
-
-    test_loss /= size
-    correct /= size
-    print(f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
+def test(net, test_loader, device):
+    net.eval()  # We are in evaluation mode
+    correct = 0
+    total = 0
+    with torch.no_grad():  # Don't accumulate gradients
+        for data in test_loader:
+            inputs, labels = data
+            inputs, labels = inputs.to(device), labels.to(device) # Send to device
+            outputs = net(inputs)  # Get predictions
+            _, predicted = torch.max(outputs.data, 1)  # Get max value
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()  # How many are correct?
+    return correct / total
 
 batch_size = 100
 # Create data loaders.
