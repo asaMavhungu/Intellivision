@@ -52,23 +52,44 @@ class MLP(nn.Module):
       x = self.output(x)  # For multi-class classification
       return x  # Has shape (B, 10)
 
-def train(dataloader, model, loss_fn, optimizer):
-    size = len(dataloader.dataset)
-    for batch, (X, y) in enumerate(dataloader):
-        X, y = X.reshape(-1, 32*32*3).to(device), y.to(device)
+# Identify device
+device = ("cuda" if torch.cuda.is_available()
+    else "mps" if torch.backends.mps.is_available()
+    else "cpu"
+)
+print(f"Using {device} device")
 
-        # Compute prediction error
-        pred = model(X)
-        loss = loss_fn(pred, y)
+# Creat the model and send its parameters to the appropriate device
+mlp = MLP().to(device)
 
-        # BackProagation
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
+examples = enumerate(test_loader)
+batch_idx, (example_data, example_targets) = next(examples)
 
-        if batch % 100 == 0:
-            loss, current = loss.item(), batch * len(X)
-            print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
+# Test on a batch of data
+with torch.no_grad():  # Don't accumlate gradients
+  mlp.eval()  # We are in evalutation mode
+  x = example_data.to(device)
+  outputs = mlp(x)  # Alias for mlp.forward
+
+  # Print example output.
+  print(torch.exp(outputs[0]))
+
+import torch.optim as optim # Optimizers
+
+# Define the training and testing functions
+def train(net, train_loader, criterion, optimizer, device):
+    net.train()  # Set model to training mode.
+    running_loss = 0.0  # To calculate loss across the batches
+    for data in train_loader:
+        inputs, labels = data  # Get input and labels for batch
+        inputs, labels = inputs.to(device), labels.to(device)  # Send to device
+        optimizer.zero_grad()  # Zero out the gradients of the ntwork i.e. reset
+        outputs = net(inputs)  # Get predictions
+        loss = criterion(outputs, labels)  # Calculate loss
+        loss.backward()  # Propagate loss backwards
+        optimizer.step()  # Update weights
+        running_loss += loss.item()  # Update loss
+    return running_loss / len(train_loader)
 
 def test(dataloader, model):
     size = len(dataloader.dataset)
