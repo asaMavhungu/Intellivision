@@ -25,10 +25,10 @@ testset = torchvision.datasets.CIFAR10(root='./data', train=False,
 
 # Send data to the data loaders
 BATCH_SIZE = 128
-train_loader = torch.utils.data.DataLoader(trainset, batch_size=BATCH_SIZE,
+train_loader = torch.utils.data.DataLoader(trainset, batch_size=BATCH_SIZE, # type: ignore
                                           shuffle=True)
 
-test_loader = torch.utils.data.DataLoader(testset, batch_size=BATCH_SIZE,
+test_loader = torch.utils.data.DataLoader(testset, batch_size=BATCH_SIZE, # type: ignore
                                           shuffle=False)
 
 
@@ -83,16 +83,12 @@ class CNN(nn.Module):
 
 # Identify device
 device = ("cuda" if torch.cuda.is_available()
-    else "mps" if torch.backends.mps.is_available()
+    else "mps" if torch.backends.mps.is_available() # type: ignore
     else "cpu"
 )
 print(f"Using {device} device")
 
 # Creat the model and send its parameters to the appropriate device
-#mlp = MLP().to(device)
-mlp = CNN().to(device)
-
-
 
 import torch.optim as optim # Optimizers
 
@@ -126,8 +122,9 @@ def test(net, test_loader, device):
     return correct / total
 
 mlp = MLP().to(device)
+print(mlp)
 
-LEARNING_RATE = 2e-2
+LEARNING_RATE = 1e-2
 MOMENTUM = 0.9
 
 # Define the loss function, optimizer, and learning rate scheduler
