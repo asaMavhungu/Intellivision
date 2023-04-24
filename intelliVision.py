@@ -1,37 +1,29 @@
-import torch
-from torch import nn
-from torch.utils.data import DataLoader
-from torchvision import datasets
-from torchvision.transforms import ToTensor, Compose, RandomHorizontalFlip, Normalize, RandomRotation, RandomCrop
+import torch  # Main Package
+import torchvision  # Package for Vision Related ML
+import torchvision.transforms as transforms  # Subpackage that contains image transforms
 
-transform_train = Compose([
-    RandomHorizontalFlip(),
-    RandomRotation(10),
-    #RandomCrop(32, padding=4),
-    ToTensor(),
-    Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+# Create the transform sequence
+transform = transforms.Compose([
+    transforms.ToTensor(),  # Convert to Tensor
+    # Normalize Image to [-1, 1] first number is mean, second is std deviation
+    transforms.Normalize((0.5,), (0.5,)) 
 ])
 
-# Normalize the test set same as training set without augmentation
-transform_test = Compose([
-    ToTensor(),
-    Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
-])
+# Load MNIST dataset
+# Train
+trainset = torchvision.datasets.CIFAR10(root='./data', train=True,
+                                      download=True, transform=transform)
+# Test
+testset = torchvision.datasets.CIFAR10(root='./data', train=False,
+                                      download=True, transform=transform)
 
-# MNIST dataset 
-training_data = datasets.CIFAR10(
-    root='./data', 
-    train=True, 
-    transform=ToTensor(),  
-    download=True
-    )
+# Send data to the data loaders
+BATCH_SIZE = 128
+train_loader = torch.utils.data.DataLoader(trainset, batch_size=BATCH_SIZE,
+                                          shuffle=True)
 
-test_data = datasets.CIFAR10(
-    root='./data',                         
-    train=False, 
-    transform=ToTensor(),
-    download=True
-    )
+test_loader = torch.utils.data.DataLoader(testset, batch_size=BATCH_SIZE,
+                                          shuffle=False)
 
 
 # Get cpu or gpu device for training.
