@@ -130,7 +130,7 @@ print(mlp)
 
 from torch.optim.lr_scheduler import StepLR
 
-LEARNING_RATE = 1e-2
+LEARNING_RATE = 1.5e-2
 MOMENTUM = 0.9
 STEP_SIZE = 10  # adjust this to suit your needs
 GAMMA = 0.1  # adjust this to suit your needs
@@ -138,6 +138,7 @@ DECAY = 0.001
 
 hidden = [512*2, 512, 256]
 
+print(f"lr={LEARNING_RATE}, m={MOMENTUM}, step={STEP_SIZE}, gamme={GAMMA}, decay={DECAY}")
 # Define the loss function, optimizer, and learning rate scheduler
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(mlp.parameters(), lr=LEARNING_RATE, momentum=MOMENTUM, weight_decay=DECAY)
@@ -147,5 +148,5 @@ lr_scheduler = StepLR(optimizer, step_size=STEP_SIZE, gamma=GAMMA)
 for epoch in range(15):
     train_loss = train(mlp, train_loader, criterion, optimizer, device)
     test_acc = test(mlp, test_loader, device)
-    lr_scheduler.step()  # apply learning rate decay
     print(f"Epoch {epoch+1}: Train loss = {train_loss:.4f}, Test accuracy = {test_acc:.4f}, Learning rate = {optimizer.param_groups[0]['lr']:.4f}")
+    lr_scheduler.step()  # apply learning rate decay
