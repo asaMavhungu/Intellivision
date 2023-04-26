@@ -120,16 +120,28 @@ def test(net, test_loader, device):
             correct += (predicted == labels).sum().item()  # How many are correct?
     return correct / total
 
-mlp = MLP().to(device)
+input = 32*32*3
+hidden = [512*2, 512, 256]
+output = 10
+
+mlp = MLP(input,hidden, output ).to(device)
 print(mlp)
+
+
+from torch.optim.lr_scheduler import StepLR
 
 LEARNING_RATE = 1e-2
 MOMENTUM = 0.9
+STEP_SIZE = 10  # adjust this to suit your needs
+GAMMA = 0.1  # adjust this to suit your needs
+DECAY = 0.001
+
+hidden = [512*2, 512, 256]
 
 # Define the loss function, optimizer, and learning rate scheduler
-#criterion = nn.NLLLoss()
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(mlp.parameters(), lr=LEARNING_RATE, momentum=MOMENTUM)
+optimizer = optim.SGD(mlp.parameters(), lr=LEARNING_RATE, momentum=MOMENTUM, weight_decay=DECAY)
+lr_scheduler = StepLR(optimizer, step_size=STEP_SIZE, gamma=GAMMA)
 
 # Train the MLP for 5 epochs
 for epoch in range(15):
