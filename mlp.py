@@ -39,7 +39,7 @@ if __name__ == "__main__":
 
 	LEARNING_RATE = 1.5e-2
 	MOMENTUM = 0.9
-	STEP_SIZE = 9  # adjust this to suit your needs
+	STEP_SIZE = 10  # adjust this to suit your needs
 	GAMMA = 0.1  # adjust this to suit your needs
 	DECAY = 0.001
 
