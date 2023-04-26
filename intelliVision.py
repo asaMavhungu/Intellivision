@@ -41,24 +41,25 @@ import torch.nn.functional as F # Activation Functions
 
 # Define the MLP architecture
 class MLP(nn.Module):
-    def __init__(self):
+    def __init__(self, input_size, hidden_sizes, output_size, dropout_rate=0.5):
         super(MLP, self).__init__()
-        self.flatten = nn.Flatten() # For flattening the 2D image
-        self.fc1 = nn.Linear(32*32*3, 512*2)  # Input is image with shape (32x32x3)
-        self.fc2 = nn.Linear(512*2, 512)  # First HL
-        self.fc3= nn.Linear(512, 256) # Second HL
-        self.fc4= nn.Linear(256, 10) # Third HL
-        self.output = nn.LogSoftmax(dim=1)
+        self.input_size = input_size
+        self.output_size = output_size
+        
+        layers = []
+        prev_size = input_size
+        for size in hidden_sizes:
+            layers.append(nn.Linear(prev_size, size))
+            layers.append(nn.ReLU())
+            prev_size = size
+        
+        layers.append(nn.Linear(prev_size, output_size))
+        self.linear_relu_stack = nn.Sequential(*layers)
 
     def forward(self, x):
-      # Batch x of shape (B, C, W, H)
-      x = self.flatten(x) # Batch now has shape (B, C*W*H)
-      x = F.relu(self.fc1(x))  # First Hidden Layer
-      x = F.relu(self.fc2(x))  # Second Hidden Layer
-      x = F.relu(self.fc3(x))  # third Hidden Layer
-      x = self.fc4(x)  # Output Layer
-      x = self.output(x)  # For multi-class classification
-      return x  # Has shape (B, 10)
+        x = x.view(-1, self.input_size)
+        logits = self.linear_relu_stack(x)
+        return logits
     
 # Define the CNN architecture
 class CNN(nn.Module):
