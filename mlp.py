@@ -3,36 +3,39 @@ import utils
 import torch.nn as nn 
 
 class MLP(nn.Module):
-    def __init__(self, input_size:int, hidden_sizes:list[int], output_size:int, dropout_rate:float =0.5) -> None:
-        super(MLP, self).__init__()
-        self.input_size = input_size
-        self.output_size = output_size
-        
-        layers: list[nn.Module] = []
-        prev_size: int = input_size
-        for size in hidden_sizes:
-            layers.append(nn.Linear(prev_size, size))
-            layers.append(nn.ReLU())
-            prev_size = size
-        
-        layers.append(nn.Linear(prev_size, output_size))
-        self.linear_relu_stack = nn.Sequential(*layers)
+	def __init__(self, input_size:int, hidden_sizes:list[int], output_size:int, dropout_rate:float =0.5) -> None:
+		super(MLP, self).__init__()
+		self.input_size = input_size
+		self.output_size = output_size
+		
+		layers: list[nn.Module] = []
+		prev_size: int = input_size
+		for size in hidden_sizes:
+			layers.append(nn.Linear(prev_size, size))
+			layers.append(nn.BatchNorm1d(size))
+			layers.append(nn.ReLU())
+			# layers.append(nn.Dropout(p=dropout_rate))
+			prev_size = size
+		
+		layers.append(nn.Linear(prev_size, output_size))
+		self.linear_relu_stack = nn.Sequential(*layers)
 
-    def forward(self, x: utils.torch.Tensor) -> utils.torch.Tensor:
-        x = x.view(-1, self.input_size)
-        logits = self.linear_relu_stack(x)
-        return logits
+	def forward(self, x: utils.torch.Tensor) -> utils.torch.Tensor:
+		x = x.view(-1, self.input_size)
+		logits = self.linear_relu_stack(x)
+		return logits
 
 if __name__ == "__main__":
-    
+	
 	import torch.optim as optim # Optimizers
 	from torch.optim.lr_scheduler import StepLR
-        
+		
 	input_size: int = 32*32*3
 	hidden_size: list[int] = [512*2, 512, 256]
 	output_size: int = 10
-        
+		
 	mlp = MLP(input_size, hidden_size, output_size ).to(utils.device)
+	print(mlp)
 
 	LEARNING_RATE = 1.5e-2
 	MOMENTUM = 0.9
