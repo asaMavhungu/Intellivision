@@ -20,7 +20,7 @@ class MLP(nn.Module):
 
     def forward(self, x: utils.torch.Tensor) -> utils.torch.Tensor:
         x = x.view(-1, self.input_size)
-        logits: utils.torch.Tensor = self.linear_relu_stack(x)
+        logits = self.linear_relu_stack(x)
         return logits
 
 if __name__ == "__main__":
@@ -33,7 +33,6 @@ if __name__ == "__main__":
 	output_size: int = 10
         
 	mlp = MLP(input_size, hidden_size, output_size ).to(utils.device)
-	print(type(mlp))
 
 	LEARNING_RATE = 1.5e-2
 	MOMENTUM = 0.9
