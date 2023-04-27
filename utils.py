@@ -1,8 +1,11 @@
-import torch  # Main Package
-import torchvision  # Package for Vision Related ML
-import torchvision.transforms as transforms  # Subpackage that contains image transforms
+import torch
+import torchvision
+import torchvision.transforms as transforms
+import torch.nn as nn 
+from torch.utils.data import DataLoader
+from torch.optim import Optimizer
 
-transform_train = transforms.Compose([
+transform_train: transforms.Compose = transforms.Compose([
     transforms.RandomHorizontalFlip(),
     transforms.RandomRotation(10),
     transforms.ToTensor(),
@@ -10,48 +13,38 @@ transform_train = transforms.Compose([
 ])
 
 # Normalize the test set same as training set without augmentation
-transform_test = transforms.Compose([
+transform_test: transforms.Compose = transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
 ])
 
 # Load MNIST dataset
 # Train
-trainset = torchvision.datasets.CIFAR10(root='./data', train=True,
+trainset: torchvision.datasets.CIFAR10 = torchvision.datasets.CIFAR10(root='./data', train=True,
                                       download=True, transform=transform_train)
 # Test
-testset = torchvision.datasets.CIFAR10(root='./data', train=False,
+testset: torchvision.datasets.CIFAR10 = torchvision.datasets.CIFAR10(root='./data', train=False,
                                       download=True, transform=transform_test)
 
 # Send data to the data loaders
-BATCH_SIZE = 128
-train_loader = torch.utils.data.DataLoader(trainset, batch_size=BATCH_SIZE, # type: ignore
+BATCH_SIZE: int = 128
+train_loader: DataLoader = torch.utils.data.DataLoader(trainset, batch_size=BATCH_SIZE, # type: ignore
                                           shuffle=True)
 
-test_loader = torch.utils.data.DataLoader(testset, batch_size=BATCH_SIZE, # type: ignore
+test_loader: DataLoader = torch.utils.data.DataLoader(testset, batch_size=BATCH_SIZE, # type: ignore
                                           shuffle=False)
 
 
 # Get cpu or gpu device for training.
-device = "cuda" if torch.cuda.is_available() else "cpu"
+device: str = "cuda" if torch.cuda.is_available() else "cpu"
 print("Using {} device".format(device))
-
-
-# Identify device
-device = ("cuda" if torch.cuda.is_available()
-    else "mps" if torch.backends.mps.is_available() # type: ignore
-    else "cpu"
-)
-print(f"Using {device} device")
-
-# Creat the model and send its parameters to the appropriate device
 
 
 
 # Define the training and testing functions
-def train(net, train_loader, criterion, optimizer, device):
+def train(net: nn.Module, train_loader: DataLoader, criterion: nn.Module , optimizer: Optimizer, device: str) -> float:
     net.train()  # Set model to training mode.
-    running_loss = 0.0  # To calculate loss across the batches
+    running_loss: float = 0.0  # To calculate loss across the batches
     for data in train_loader:
         inputs, labels = data  # Get input and labels for batch
         inputs, labels = inputs.to(device), labels.to(device)  # Send to device
@@ -63,10 +56,10 @@ def train(net, train_loader, criterion, optimizer, device):
         running_loss += loss.item()  # Update loss
     return running_loss / len(train_loader)
 
-def test(net, test_loader, device):
+def test(net: nn.Module, test_loader: DataLoader, device: str) -> float:
     net.eval()  # We are in evaluation mode
-    correct = 0
-    total = 0
+    correct: int = 0
+    total: int = 0
     with torch.no_grad():  # Don't accumulate gradients
         for data in test_loader:
             inputs, labels = data
