@@ -9,29 +9,21 @@ class ResBlock(nn.Module):
 	Implements the Residual Block used in Residual Neural Networks (ResNets).
 
 	Args:
-		in_channels (int): Number of input channels to the block.
-
-		out_channels (int): Number of output channels from the block.
-
-		stride (int): Stride size for the first convolutional layer. Default is 1.
-
-		downsample (nn.Module): Downsample function to be used if the number of input and output channels are different. Default is None.
+	- in_channels (int): Number of input channels to the block.
+	- out_channels (int): Number of output channels from the block.
+	- stride (int): Stride size for the first convolutional layer. Default is 1.
+	- downsample (nn.Module): Downsample function to be used if the number of input and output channels are different. Default is None.
 
 	Attributes:
-		conv1 (nn.Conv2d): First convolutional layer.
-
-		bn1 (nn.BatchNorm2d): Batch normalization layer after first convolutional layer.
-
-		relu (nn.ReLU): ReLU activation function.
-
-		conv2 (nn.Conv2d): Second convolutional layer.
-
-		bn2 (nn.BatchNorm2d): Batch normalization layer after second convolutional layer.
-
-		downsample (nn.Module): Downsample function to be used if the number of input and output channels are different.
+	- conv1 (nn.Conv2d): First convolutional layer.
+	- bn1 (nn.BatchNorm2d): Batch normalization layer after first convolutional layer.
+	- relu (nn.ReLU): ReLU activation function.
+	- conv2 (nn.Conv2d): Second convolutional layer.
+	- bn2 (nn.BatchNorm2d): Batch normalization layer after second convolutional layer.
+	- downsample (nn.Module): Downsample function to be used if the number of input and output channels are different.
 
 	Methods:
-		forward(x: torch.Tensor) -> torch.Tensor: Performs forward pass through the ResBlock.
+	- forward(x: torch.Tensor) -> torch.Tensor: Performs forward pass through the ResBlock.
 	"""
 	def __init__(self, in_channels: int, out_channels: int, stride=1, downsample=None)-> None:
 		super(ResBlock, self).__init__()
@@ -52,10 +44,10 @@ class ResBlock(nn.Module):
 		Performs a forward pass through the ResBlock.
 
 		Args:
-			x (torch.Tensor): Input tensor of shape (batch_size, in_channels, height, width).
+		- x (torch.Tensor): Input tensor of shape (batch_size, in_channels, height, width).
 
 		Returns:
-			torch.Tensor: Output tensor of shape (batch_size, out_channels, height, width).
+		- torch.Tensor: Output tensor of shape (batch_size, out_channels, height, width).
 		"""
 		# save x to use as identity function later
 		identity = x
@@ -85,10 +77,10 @@ class ResNet(nn.Module):
 		Initialize the convolutional and fully connected layers of the ResNet network.
 
 		Args:
-			None
+		- None
 
 		Returns:
-			None
+		- None
 		"""
 		super(ResNet, self).__init__()
 		# input = 3x32x32, output = 32x32x32
@@ -113,10 +105,10 @@ class ResNet(nn.Module):
 		Pass the input tensor through the ResNet network layers.
 
 		Args:
-			x (utils.torch.Tensor): input tensor to the network
+		- x (utils.torch.Tensor): input tensor to the network
 
 		Returns:
-			utils.torch.Tensor: output tensor of the network
+		- utils.torch.Tensor: output tensor of the network
 		"""
 		x = self.conv1(x)
 		x = self.bn1(x)
