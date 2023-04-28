@@ -4,7 +4,19 @@ import torch.nn as nn  # Layers
 import torch.nn.functional as F # Activation Functions
 
 class CNN(nn.Module):
+	"""
+    Convolutional Neural Network class that implements a simple architecture for image classification.
+    """
 	def __init__(self) -> None:
+		"""
+        Initializes the CNN class by setting up the layers of the network.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
 		super(CNN, self).__init__()
 		# input = 3x32x32, output = 6x28x28
 		self.conv1 = nn.Conv2d(in_channels=3, out_channels=6,kernel_size=5, stride=1,padding=0)  
@@ -24,6 +36,15 @@ class CNN(nn.Module):
 		self.fc3 = nn.Linear(84, 10)  
 
 	def forward(self, x: utils.torch.Tensor) -> utils.torch.Tensor:
+		"""
+        Performs a forward pass through the CNN model.
+
+        Args:
+            x (torch.Tensor): input tensor of shape [batch_size, 3, 32, 32].
+
+        Returns:
+            output tensor of shape [batch_size, 10].
+        """
 		x = F.relu(self.conv1(x))
 		x = self.pool1(x)
 		x = F.relu(self.conv2(x))
