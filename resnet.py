@@ -52,7 +52,7 @@ class ResNet(nn.Module):
         # input = 32x32x32, output = 32x16x16
         self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        downsample=nn.Sequential(nn.Conv2d(32, 64, kernel_size=1, stride=2), nn.BatchNorm2d(64))
+        downsample=nn.Sequential(nn.Conv2d(32, 64, kernel_size=1, stride=2))
         # First ResBlock, input size = 32x16x16, output size = 64x8x8
         self.residual_block1 = ResBlock(32, 64, stride=2, downsample=downsample)
         # Second ResBlock , input size = 64x8x8, output size = 64x8x8
@@ -87,7 +87,7 @@ if __name__ == "__main__":
 
 	LEARNING_RATE = 1.5e-2
 	MOMENTUM = 0.9
-	STEP_SIZE = 8
+	STEP_SIZE = 6
 	GAMMA = 0.1
 	DECAY = 0.001
 
