@@ -4,6 +4,15 @@ import torch.nn as nn
 
 class MLP(nn.Module):
 	def __init__(self, input_size:int, hidden_sizes:list[int], output_size:int, dropout_rate:float =0.5) -> None:
+		"""
+		Multilayer perceptron neural network implementation with batch normalization and ReLU activation.
+		
+		Args:
+		- input_size (int): The number of input features.
+		- hidden_sizes (list[int]): A list of integers specifying the number of nodes in each hidden layer.
+		- output_size (int): The number of output features.
+		- dropout_rate (float): The dropout rate (default: 0.5).
+		"""
 		super(MLP, self).__init__()
 		self.input_size = input_size
 		self.output_size = output_size
@@ -21,13 +30,22 @@ class MLP(nn.Module):
 		self.linear_relu_stack = nn.Sequential(*layers)
 
 	def forward(self, x: utils.torch.Tensor) -> utils.torch.Tensor:
+		"""
+		Forward pass of the MLP model.
+		
+		Args:
+		- x (utils.torch.Tensor): The input tensor.
+		
+		Returns:
+		- utils.torch.Tensor: The output tensor.
+		"""
 		x = x.view(-1, self.input_size)
 		logits = self.linear_relu_stack(x)
 		return logits
 
 if __name__ == "__main__":
 	
-	import torch.optim as optim # Optimizers
+	import torch.optim as optim
 	from torch.optim.lr_scheduler import StepLR
 		
 	input_size: int = 32*32*3
