@@ -13,7 +13,7 @@ class ResBlock(nn.Module):
         self.bn1 = nn.BatchNorm2d(out_channels)
         # Pass through ReLu
         self.relu = nn.ReLU(inplace=True)
-        # # input = out_channel, output = out_channel (kernel 3, paddin 1, stride 1)
+        # input = out_channel, output = out_channel (kernel 3, paddin 1, stride 1)
         self.conv2 = nn.Conv2d(out_channels, out_channels, kernel_size=3, stride=1, padding=1, bias=False)  
         # Use batchNorm to re-normalize features
         self.bn2 = nn.BatchNorm2d(out_channels) 
@@ -43,22 +43,37 @@ class ResBlock(nn.Module):
         return out
 
 class ResNet(nn.Module):
-    def __init__(self):
+    def __init__(self) -> None:
         super(ResNet, self).__init__()
-        # input = 3x32x32, output = 16x32x32
-        self.conv1 = nn.Conv2d(in_channels=3, out_channels=16,kernel_size=3, stride=1,padding=1)  
-        # input = 16x32x32, output = 16x16x16
-        self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)  
-        self.residual_block = ResBlock(16, 16)
-        # input = 16x5x5, output = 120
-        self.fc1 = nn.Linear(16 * 16 * 16, 10)    
+        # input = 3x32x32, output = 32x32x32
+        self.conv1 = nn.Conv2d(3, 32, kernel_size=3, stride=1, padding=1)
+        self.bn1 = nn.BatchNorm2d(32)
+        self.relu = nn.ReLU(inplace=True)
+        # input = 32x32x32, output = 32x16x16
+        self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-    def forward(self, x):
-        x = F.relu(self.conv1(x))
+        downsample=nn.Sequential(nn.Conv2d(32, 64, kernel_size=1, stride=2), nn.BatchNorm2d(64))
+        # First ResBlock, input size = 32x16x16, output size = 64x8x8
+        self.residual_block1 = ResBlock(32, 64, stride=2, downsample=downsample)
+        # Second ResBlock , input size = 64x8x8, output size = 64x8x8
+        self.residual_block2 = ResBlock(64, 64)
+        # input size = 64x8x8, output size = 64x1x1
+        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        # input size = 64, output size = 10
+        self.fc = nn.Linear(64, 10)   
+
+    def forward(self, x) -> utils.torch.Tensor:
+        x = self.conv1(x)
+        x = self.bn1(x)
+        x = self.relu(x)
         x = self.pool1(x)
-        x = self.residual_block(x)
-        x = x.view(-1, 16**3)
-        x = self.fc1(x)
+
+        x = self.residual_block1(x)
+        x = self.residual_block2(x)
+
+        x = self.avgpool(x)
+        x = x.view(x.size(0), -1)
+        x = self.fc(x)
         return x
 
 
@@ -72,7 +87,7 @@ if __name__ == "__main__":
 
 	LEARNING_RATE = 1.5e-2
 	MOMENTUM = 0.9
-	STEP_SIZE = 10
+	STEP_SIZE = 8
 	GAMMA = 0.1
 	DECAY = 0.001
 
