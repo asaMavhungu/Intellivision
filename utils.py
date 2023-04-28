@@ -47,18 +47,14 @@ def train(net: nn.Module, train_loader: DataLoader, criterion: nn.Module , optim
 	Function to train a PyTorch neural network.
 
 	Args:
-		net (nn.Module): A PyTorch neural network model.
-
-		train_loader (DataLoader): A PyTorch DataLoader object containing the training data.
-
-		criterion (nn.Module): A PyTorch loss function.
-
-		optimizer (Optimizer): A PyTorch optimizer object.
-		
-		device (str): A string specifying the device to be used for training.
+	- net (nn.Module): A PyTorch neural network model.
+	- train_loader (DataLoader): A PyTorch DataLoader object containing the training data.
+	- criterion (nn.Module): A PyTorch loss function.
+	- optimizer (Optimizer): A PyTorch optimizer object.
+	- device (str): A string specifying the device to be used for training.
 
 	Returns:
-		float: The average training loss over all batches.
+	- float: The average training loss over all batches.
 	"""
 
 	net.train()  # Set model to training mode.
@@ -79,14 +75,12 @@ def test(net: nn.Module, test_loader: DataLoader, device: str) -> float:
 	Function to test a PyTorch neural network.
 
 	Args:
-		net (nn.Module): A PyTorch neural network model.
-
-		test_loader (DataLoader): A PyTorch DataLoader object containing the testing data.
-
-		device (str): A string specifying the device to be used for testing.
+	- net (nn.Module): A PyTorch neural network model.
+	- test_loader (DataLoader): A PyTorch DataLoader object containing the testing data.
+	- device (str): A string specifying the device to be used for testing.
 
 	Returns:
-		float: The accuracy of the model on the testing data.
+	- float: The accuracy of the model on the testing data.
 	"""
 	net.eval()  # We are in evaluation mode
 	correct: int = 0
