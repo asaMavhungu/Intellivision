@@ -56,12 +56,29 @@ class CNN(nn.Module):
 		return x
 	
 if __name__ == "__main__":
-	
+
+	import sys
+
 	import torch.optim as optim
 	from torch.optim.lr_scheduler import StepLR
 		
-	 
+	
 	cnn = CNN().to(utils.device)
+
+	if len(sys.argv) == 2:
+		if sys.argv[1] == "-load":
+			print("Loading model...")
+			# load the model parameters
+			cnn.load_state_dict(utils.torch.load("./cnn.pt"))
+			print("Done!")
+			test_acc = utils.test(cnn, utils.test_loader, utils.device)
+			print(f"Test accuracy = {test_acc:.4f}")
+		else:
+			print("Invalid argument. Usage: python MODEL_NAME.py [-load | -save]")
+	elif len(sys.argv) != 1:
+		print("Invalid number of arguments. Usage: python MODEL_NAME.py [-load | -save]")
+
+
 	print(cnn)
 
 	LEARNING_RATE = 1.5e-2
