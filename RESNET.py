@@ -122,13 +122,11 @@ class ResNet(nn.Module):
 		x = x.view(x.size(0), -1)
 		x = self.fc(x)
 		return x
-
-
-if __name__ == "__main__":
 	
+def main():
 	import torch.optim as optim
 	from torch.optim.lr_scheduler import StepLR
-		
+
 	resNet = ResNet().to(utils.device)
 	print(resNet)
 
@@ -150,3 +148,34 @@ if __name__ == "__main__":
 		test_acc = utils.test(resNet, utils.test_loader, utils.device)
 		print(f"Epoch {epoch+1}: Train loss = {train_loss:.4f}, Test accuracy = {test_acc:.4f}, Learning rate = {optimizer.param_groups[0]['lr']:.4f}")
 		lr_scheduler.step()  # apply learning rate decay
+
+	if len(sys.argv) == 2:
+		if sys.argv[1] == "-save":
+			print("Saving model...")
+			utils.torch.save(resNet.state_dict(), "./resNet.pt")
+			print("Done!")
+
+
+if __name__ == "__main__":
+	import sys
+	import os
+	
+	if len(sys.argv) != 1 and len(sys.argv) != 2:
+		print("Invalid number of arguments. Usage: python MODEL_NAME.py [-load | -save]")
+	
+	elif len(sys.argv) == 2 and sys.argv[1] not in ["-load", "-save"]:
+		print("Invalid argument. Usage: python MODEL_NAME.py [-load | -save]")
+
+	elif len(sys.argv) == 2 and sys.argv[1] == "-load":
+		if os.path.isfile("./resNet.pt"):
+			resNet = ResNet().to(utils.device)
+			print("Loading model...")
+			resNet.load_state_dict(utils.torch.load("./resNet.pt"))
+			print("Done!")
+			test_acc = utils.test(resNet, utils.test_loader, utils.device)
+			print(f"Test accuracy = {test_acc*100:.2f}%")
+		else:
+			print("Saved model not found!")
+
+	elif len(sys.argv) == 2 or len(sys.argv) == 1:
+		main()
