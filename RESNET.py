@@ -111,7 +111,7 @@ class ResNet(nn.Module):
 		- utils.torch.Tensor: output tensor of the network
 		"""
 		x = self.conv1(x)
-		x = self.bn1(x)
+		# x = self.bn1(x)
 		x = self.relu(x)
 		x = self.pool1(x)
 
@@ -142,8 +142,8 @@ def main():
 	optimizer = optim.SGD(resNet.parameters(), lr=LEARNING_RATE, momentum=MOMENTUM, weight_decay=DECAY)
 	lr_scheduler = StepLR(optimizer, step_size=STEP_SIZE, gamma=GAMMA)
 
-	# Train the MLP for 15 epochs
-	for epoch in range(15):
+	# Train the MLP for 10 epochs
+	for epoch in range(10):
 		train_loss = utils.train(resNet, utils.train_loader, criterion, optimizer, utils.device)
 		test_acc = utils.test(resNet, utils.test_loader, utils.device)
 		print(f"Epoch {epoch+1}: Train loss = {train_loss:.4f}, Test accuracy = {test_acc:.4f}, Learning rate = {optimizer.param_groups[0]['lr']:.4f}")
