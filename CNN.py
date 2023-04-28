@@ -58,6 +58,7 @@ class CNN(nn.Module):
 if __name__ == "__main__":
 
 	import sys
+	import os
 
 	import torch.optim as optim
 	from torch.optim.lr_scheduler import StepLR
@@ -72,12 +73,15 @@ if __name__ == "__main__":
 		print("Invalid argument. Usage: python MODEL_NAME.py [-load | -save]")
 
 	elif len(sys.argv) == 2 and sys.argv[1] == "-load":
-		print("Loading model...")
-		# load the model parameters
-		cnn.load_state_dict(utils.torch.load("./cnn.pt"))
-		print("Done!")
-		test_acc = utils.test(cnn, utils.test_loader, utils.device)
-		print(f"Test accuracy = {test_acc*100:.2f}%")
+		if os.path.isfile("./cnn.pt"):
+			print("Loading model...")
+			# load the model parameters
+			cnn.load_state_dict(utils.torch.load("./mlp.pt"))
+			print("Done!")
+			test_acc = utils.test(cnn, utils.test_loader, utils.device)
+			print(f"Test accuracy = {test_acc*100:.2f}%")
+		else:
+			print("Saved model not found!")
 
 
 	elif len(sys.argv) == 2 or len(sys.argv) == 1:
