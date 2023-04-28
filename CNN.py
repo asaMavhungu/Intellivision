@@ -55,16 +55,44 @@ class CNN(nn.Module):
 		x = self.fc3(x)
 		return x
 	
+def main():
+
+	import torch.optim as optim
+	from torch.optim.lr_scheduler import StepLR
+
+	cnn = CNN().to(utils.device)
+
+	print(cnn)
+
+	LEARNING_RATE = 1.5e-2
+	MOMENTUM = 0.9
+	STEP_SIZE = 8 
+	GAMMA = 0.1
+	DECAY = 0.001
+
+	print(f"lr={LEARNING_RATE}, m={MOMENTUM}, step={STEP_SIZE}, gamme={GAMMA}, decay={DECAY}")
+	# Define the loss function, optimizer, and learning rate scheduler
+	criterion = nn.CrossEntropyLoss()
+	optimizer = optim.SGD(cnn.parameters(), lr=LEARNING_RATE, momentum=MOMENTUM, weight_decay=DECAY)
+	lr_scheduler = StepLR(optimizer, step_size=STEP_SIZE, gamma=GAMMA)
+
+	# Train the MLP for 15 epochs
+	for epoch in range(15):
+		train_loss = utils.train(cnn, utils.train_loader, criterion, optimizer, utils.device)
+		test_acc = utils.test(cnn, utils.test_loader, utils.device)
+		print(f"Epoch {epoch+1}: Train loss = {train_loss:.4f}, Test accuracy = {test_acc:.4f}, Learning rate = {optimizer.param_groups[0]['lr']:.4f}")
+		lr_scheduler.step()  # apply learning rate decay
+
+	if len(sys.argv) == 2:
+		if sys.argv[1] == "-save":
+			print("Saving model...")
+			utils.torch.save(cnn.state_dict(), "./cnn.pt")
+			print("Done!")
+
 if __name__ == "__main__":
 
 	import sys
 	import os
-
-	import torch.optim as optim
-	from torch.optim.lr_scheduler import StepLR
-		
-	
-	cnn = CNN().to(utils.device)
 
 	if len(sys.argv) != 1 and len(sys.argv) != 2:
 		print("Invalid number of arguments. Usage: python MODEL_NAME.py [-load | -save]")
@@ -74,9 +102,10 @@ if __name__ == "__main__":
 
 	elif len(sys.argv) == 2 and sys.argv[1] == "-load":
 		if os.path.isfile("./cnn.pt"):
+			cnn = CNN().to(utils.device)
 			print("Loading model...")
 			# load the model parameters
-			cnn.load_state_dict(utils.torch.load("./mlp.pt"))
+			cnn.load_state_dict(utils.torch.load("./cnn.pt"))
 			print("Done!")
 			test_acc = utils.test(cnn, utils.test_loader, utils.device)
 			print(f"Test accuracy = {test_acc*100:.2f}%")
@@ -85,29 +114,4 @@ if __name__ == "__main__":
 
 
 	elif len(sys.argv) == 2 or len(sys.argv) == 1:
-		print(cnn)
-
-		LEARNING_RATE = 1.5e-2
-		MOMENTUM = 0.9
-		STEP_SIZE = 8 
-		GAMMA = 0.1
-		DECAY = 0.001
-
-		print(f"lr={LEARNING_RATE}, m={MOMENTUM}, step={STEP_SIZE}, gamme={GAMMA}, decay={DECAY}")
-		# Define the loss function, optimizer, and learning rate scheduler
-		criterion = nn.CrossEntropyLoss()
-		optimizer = optim.SGD(cnn.parameters(), lr=LEARNING_RATE, momentum=MOMENTUM, weight_decay=DECAY)
-		lr_scheduler = StepLR(optimizer, step_size=STEP_SIZE, gamma=GAMMA)
-
-		# Train the MLP for 15 epochs
-		for epoch in range(15):
-			train_loss = utils.train(cnn, utils.train_loader, criterion, optimizer, utils.device)
-			test_acc = utils.test(cnn, utils.test_loader, utils.device)
-			print(f"Epoch {epoch+1}: Train loss = {train_loss:.4f}, Test accuracy = {test_acc:.4f}, Learning rate = {optimizer.param_groups[0]['lr']:.4f}")
-			lr_scheduler.step()  # apply learning rate decay
-
-		if len(sys.argv) == 2:
-			if sys.argv[1] == "-save":
-				print("Saving model...")
-				utils.torch.save(cnn.state_dict(), "./cnn.pt")
-				print("Done!")
+		main()
