@@ -21,7 +21,7 @@ class MLP(nn.Module):
 		prev_size: int = input_size
 		for size in hidden_sizes:
 			layers.append(nn.Linear(prev_size, size))
-			layers.append(nn.BatchNorm1d(size))
+			# layers.append(nn.BatchNorm1d(size))
 			layers.append(nn.ReLU())
 			# layers.append(nn.Dropout(p=dropout_rate))
 			prev_size = size
