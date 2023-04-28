@@ -12,10 +12,10 @@ class CNN(nn.Module):
         Initializes the CNN class by setting up the layers of the network.
 
         Args:
-            None
+    	- None
 
         Returns:
-            None
+    	- None
         """
 		super(CNN, self).__init__()
 		# input = 3x32x32, output = 6x28x28
@@ -40,10 +40,10 @@ class CNN(nn.Module):
         Performs a forward pass through the CNN model.
 
         Args:
-            x (torch.Tensor): input tensor of shape [batch_size, 3, 32, 32].
+        - x (torch.Tensor): input tensor of shape [batch_size, 3, 32, 32].
 
         Returns:
-            output tensor of shape [batch_size, 10].
+        - output tensor of shape [batch_size, 10].
         """
 		x = F.relu(self.conv1(x))
 		x = self.pool1(x)
